@@ -99,6 +99,75 @@ i）c＋＋模块的编译
 i）json文件
 利用fs模块同步读取json文件，然后调用JSON.parse得到对象，然后将它赋值给模块对象的exports
 2.3 核心模块
+核心模块分为用c＋＋编写的，和用js编写的2部分。
 2.3.1 js核心模块的编译过程
+1.转存为c＋＋代码
+2.编译js核心模块
+不太懂
+2.3.2 c＋＋核心模块的编译过程
+1.内建模块的组织形式
+内建模块的内部结构定义如下：
+struct node_module_struct{
+    int version;
+    void *dso_handle;
+    const char *filename;
+    void (*register_func)(v8::Handle<v8::Object> target);
+    const char*modname;
+}
+Node的buffer、cryto、evals、fs、os等模块是部分通过c/c++编写的。
+好处：被编译进二进制文件，一旦node开始执行，它们就被直接加载进内存中，直接执行。
+2.内建模块的导出
+在node的所有模块类型中，存在一种依赖层级关系，即文件模块依赖核心模块、核心模块依赖内建模块。内建模块可以将内部变量或者方法导出，
+以供外部js核心模块调用。
+2.3.3 核心模块的引入流程
+2.3.4 编写核心模块
+2.4 c/c＋＋扩展模块
+js的一个典型的弱点是位运算，js中只有double类型的数据类型，在进行位运算时，需要将double转换为int
+本节分析c／c＋＋拓展模块的编写、编译、加载、导出的过程。
+2.4.1 前提条件
+2.4.2 c／c＋＋扩展模块的编写
+2.5 模块调用栈
+文件模块、核心模块、内建模块、c／c＋＋拓展模块阐述之后，调用关系为：
+c／c＋＋内建模块属于最底层的模块，属于核心模块，主要提供api给js核心模块和第三方文件模块，js核心模块主要功能：1，作为c／c＋＋
+内建模块的封装层和乔阶层，供文件模块调用。2，纯粹的功能模块，不需要跟底层打交道。
+2.6 包与npm
+包和npm是将模块联系起来的一种机制。
+commonjs的包规范的定义，由包结构和包描述文件2个部分组成。
+2.6.1 包结构
+完全符合commonjs规范的包目录应该包含如下文件：
+package.json: 包描述文件
+bin:用于存放可执行二进制文件的目录
+lib：用于存放js的目录
+doc：用于存放文档的目录
+test：用于存放单元测试用例的代码
+2.6.2 包描述文件与npm
+npm的所有行为都与包文件描述文件的字段息息相关。commonjs为package.json定义了如下一些必需的字段。
+i）name，包名，
+i）description: 包简介
+i）version：版本号
+i）keywords：关键词
+i）maintainers： 包维护者列表
+i）contributors：贡献者列表
+i）bugs
+i）licenses：许可证列表
+i）repositories：托管源代码的位置列表
+i）dependencies：使用当前包需要依赖的包列表
+除了必选字段外，还定义了一些可选字段
+i）homepage，当前包的网站地址
+i）os，操作系统支持列表
+i）cpu，cpu架构的支持列表
+i）engine：支持的js引擎列表
+i）builtin：当前包是否内建在底层系统的标准组件
+i）directories：包目录说明
+i）implements：实现规范的列表，标志当前包实现了commonjs的哪些规范
+i）scripts：脚本说明文件，被包管理器用来安装、编译、测试和卸载包。
+在包描述文件的规范中，npm实际需要的字段主要有，name、version、description、keywords、repositories、author、bin、main
+scripts、engines、dependencies、devDependencies
+多了
+i）author：
+i）bin：一些包作者希望包可以作为命令行工具使用，配置好bin字段后，通过npm install，可以将脚本添加到执行路径中。
+i）main：包的入口
+i）devDependencies：只在开发时需要的依赖
+2.6.3 npm常用功能
 
 */
