@@ -169,5 +169,84 @@ i）bin：一些包作者希望包可以作为命令行工具使用，配置好b
 i）main：包的入口
 i）devDependencies：只在开发时需要的依赖
 2.6.3 npm常用功能
-
+commonjs规范是理论，npm是其中的一种实践，借助npm，node与第三方模块之间形成一个
+很好的生态系统。npm还有一些巧妙的用法
+1.查看帮助
+npm
+2.安装依赖包
+npm install packagename
+i）如果包中含有命令行工具，需要执行npm install packagename －g，－g是将一个包安装为全局可用的可执行命令，根据包描述文件的
+bin字段配置，将实际脚本链接到node可执行文件相同的路径下。其实，通过全局安装的包放在一个统一的路径下，通过软连接的方式链接到
+node的可执行目录下。
+i）从本地安装
+i）从非官方源安装
+如果不能通过官方源安装，可以通过镜像源安装。在执行命令时，添加--registry=http://registry.url
+3.npm 钩子命令
+package.json中的scripts字段是让包在安装或者卸载过程中提供钩子机制：
+"scripts":{
+    "preinstall": "preinstall.js"
+    "install":"install.js"
+}
+在执行npm install命令时，preinstall将会被首先执行
+4.发布包
+i）编写包
+i）注册包仓库账号
+i）上传包 npm publish
+i）管理包权限：通常，一个包只有一个人拥有权限发布，可以使用npm owner添加、删除包的拥有者
+i）分析包：npm ls，为你分析出当前路径下能够通过模块路径找到的所有包，并生成依赖树。
+2.6.4 局域npm
+为了保护代码的隐私性，企业可以搭建自己的npm仓库。
+2.6.5 npm 潜在问题
+i）包的质量良莠不齐 i）node代码可以运行在服务器端，需要考虑安全问题
+npm模块首页，上的依赖榜，可以说明模块的质量和可靠性。还有，npm大多数包是通过github托管的，模块项目的观察者数量和分支数量
+也能从侧面反映这个模块的可靠性。还有，包的测试和文档，一个没有单元测试的包基本上是无法被信任的，没有文档的包也不行。
+》具备良好的测试
+》具备良好的文档，README、API
+》具备良好的测试覆盖率
+》具备良好的编码规范
+》更多条件
+2.7 前后端共用模块
+2.7.1 模块的侧重点
+前后端js分别运行在http的两端，浏览器端的js从一个服务器奋发到多个客户端执行，而服务器端的js需要多次执行，前者瓶颈在带宽，
+后者的瓶颈在cpu和内存等资源。前者通过网络加载代码，后者从磁盘加载。
+纵观node模块的引入过程，几乎都是同步的，尽管与node强调异步的行为有些相反。但它是合理的。但是放到浏览器端，就不行，因为网络
+的原因，太慢了，于是就出现了AMD规范，全称：Asynchronous Module Definition,异步模块定义。
+详见：https://github.com/amdjs/amdjs-api/wiki/AMD
+2.7.2 AMD规范
+amd规范是commonjs规范的一个延伸，模块定义如下：
+define(id?,dependencies?,factory); //factory的内容是实际代码的内容。例子
+2.7.3 CMD规范
+AMD需要在声明模块的时候指定所有的依赖，通过形参传递到模块内容中。例子
+不太懂？？
+2.7.4 兼容多种模块规范
+为了让同一个模块可以运行在前后端，在写作过程中，需要考虑兼容前端也实现了模块规范的环境，例子，将hello方法定义到不同的运行环境
+中，它能够兼容node、amd、cmd以及常见的浏览器环境中。例子
 */
+// 简单的符合amd规范的模块
+define(function(){
+    var exports = {};
+    exports.sayHello = function(){
+        console.log("hello from module:" + module.id);
+    };
+    return exports;
+})
+
+(function(name, definition){
+    //检测上下文环境是否是amd或者cmd
+    var hasDefine = typeof define === "function",
+    //检查上下文环境是否为node
+        hasExports = typeof module !== 'undefined' && module.exports;
+    if(hasDefine){
+        define(definition);
+    }else if(hasExports){
+        //node模块
+        module.exports = definition();
+    }else{
+        //将模块的执行结果挂在window变量中，在浏览器中this指向window对象
+        this[name] = definition();
+    }
+})('hello',function(){
+    var hello = function(){};
+    return hello;
+});
+
