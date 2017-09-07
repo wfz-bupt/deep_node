@@ -59,6 +59,35 @@ PromiseA提议对单个异步操作做出如下抽象定义
 ＊then方法继续返回Promise对象，以实现链式调用。
 promiseA的实现，例子
 一个Promise对象，一个Deferred对象
+Q模块是Promises/A规范的一个实现，
+2.Promise中的多异步协作
+3.Promise的进阶知识
+支持序列执行的promise
+将API promise化
+研究下q怎么用
+4.3.3 流程控制库
+事件发布/订阅模式和 promise/Deferred模式，都是种编程模式
+1.尾触发和next
+尾触发：需要手工调用才能持续执行后续调用的一类方法。常见的关键词是next。尾部触发目前应用最多的地方是Connect的
+中间件。
+注册中间件就是将中间件代码放入队列中，next方法作用是将队列中的中间件取出并执行。
+2 async
+最知名的流程控制模块，async，长期占据npm依赖榜的第三名。模块提供了20多个方法用于处理异步的各种协作模式。以下为
+几种典型用法。
+＊异步的串行执行, 例子 async.series方法
+＊异步的并行执行， 例子 async.parallel方法
+＊异步调用的依赖处理，例子 async.waterfall
+* 自动依赖处理，aync.auto方法，根据依赖关系自动分析，以最佳的顺序执行以上业务。
+3.Step
+另一个知名的流程控制库是step
+4.wind
+思路完全不同的异步编程方案 wind
+4.4 异步并发控制
+用异步实现并发很容易，但是，也要适当控制，防止过于压榨底层系统的性能。
+4.4.1 bagpipe的解决方案
+对既有的异步API添加过载保护，
+4.4.2 aync的解决方案
+
 */
 // 利用发布订阅模式来处理业务
 var events = require("events");
@@ -167,3 +196,4 @@ Promise.prototype.then = function (fulfilledHandler, errorHandler, progressHandl
         this.once('progress', progressHandler);
     }
 }
+
